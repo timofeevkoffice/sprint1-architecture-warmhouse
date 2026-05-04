@@ -16,32 +16,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-      with:
-        ref: ${{ github.head_ref || github.ref_name }}
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Java
-      uses: actions/setup-java@v2
-      with:
-        java-version: '11'
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-    - name: Install PlantUML
-      run: sudo apt-get update && sudo apt-get install -y plantuml
+      - name: Install PlantUML
+        run: sudo apt-get update && sudo apt-get install -y plantuml
 
-    - name: Generate Diagrams
-      run: |
-        mkdir -p diagrams
-        plantuml -o ../diagrams "C4/**/*.puml"
+      - name: Generate Diagrams
+        run: |
+          mkdir -p diagrams
+          # Генерируем все .puml файлы, сохраняя структуру вложенности
+          plantuml -tpng -o "../diagrams" "C4/**/*.puml"
 
-    - name: Commit and push diagrams
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git add diagrams/*.png
-        if ! git diff --cached --quiet; then
-          git commit -m "Автоматическая генерация диаграмм C4"
-          git push origin HEAD:${{ github.head_ref || github.ref_name }}
-        else
-          echo "Нет изменений для коммита"
-        fi
+      - name: Commit and push diagrams
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add diagrams/
+          if ! git diff --cached --quiet; then
+            git commit -m "Автоматическая генерация диаграмм C4"
+            git push origin HEAD:${{ github.head_ref || github.ref_name }}
+          else
+            echo "Нет изменений для коммита"
+          fi
