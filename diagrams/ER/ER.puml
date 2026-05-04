@@ -1,0 +1,81 @@
+@startuml
+
+entity User {
+  * user_id : UUID <<PK>>
+  --
+  email : VARCHAR(255) <<UK>>
+  password_hash : VARCHAR(255)
+  full_name : VARCHAR(100)
+  role : VARCHAR(20)
+  created_at : TIMESTAMP
+}
+
+entity House {
+  * house_id : UUID <<PK>>
+  --
+  user_id : UUID <<FK>>
+  name : VARCHAR(100)
+  address : TEXT
+  timezone : VARCHAR(50)
+}
+
+entity Device {
+  * device_id : UUID <<PK>>
+  --
+  house_id : UUID <<FK>>
+  device_type : VARCHAR(50)
+  manufacturer : VARCHAR(100)
+  model : VARCHAR(100)
+  mac_address : VARCHAR(17) <<UK>>
+  protocol : VARCHAR(20)
+  config : JSONB
+  status : VARCHAR(20)
+  registered_at : TIMESTAMP
+  last_seen : TIMESTAMP
+}
+
+entity Sensor {
+  * sensor_id : UUID <<PK>>
+  --
+  device_id : UUID <<FK>>
+  sensor_type : VARCHAR(50)
+  unit : VARCHAR(20)
+}
+
+entity Telemetry {
+  * telemetry_id : BIGINT <<PK>>
+  --
+  sensor_id : UUID <<FK>>
+  value : DECIMAL(10,2)
+  recorded_at : TIMESTAMP
+}
+
+entity Scenario {
+  * scenario_id : UUID <<PK>>
+  --
+  house_id : UUID <<FK>>
+  name : VARCHAR(100)
+  trigger_condition : JSONB
+  action : JSONB
+  enabled : BOOLEAN
+  created_at : TIMESTAMP
+}
+
+entity ActionLog {
+  * log_id : BIGINT <<PK>>
+  --
+  scenario_id : UUID <<FK>>
+  triggered_at : TIMESTAMP
+  executed_command : JSONB
+  result : VARCHAR(20)
+}
+
+' Связи между сущностями
+User ||--o{ House : owns
+House ||--o{ Device : contains
+Device ||--o{ Sensor : has
+Sensor ||--o{ Telemetry : generates
+House ||--o{ Scenario : defines
+Scenario ||--o{ ActionLog : produces
+
+@enduml

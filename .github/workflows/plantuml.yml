@@ -21,16 +21,16 @@ jobs:
 
       - name: Generate PNG side by side with .puml
         run: |
-          docker run --rm -v ${{ github.workspace }}:/data plantuml/plantuml -tpng "/data/C4/**/*.puml"
+          docker run --rm -v ${{ github.workspace }}:/data plantuml/plantuml -tpng "/data/diagrams/**/*.puml"
 
       - name: Commit and push generated PNGs
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Добавляем только PNG-файлы внутри C4
-          git add 'C4/**/*.png'
+          # Добавляем только PNG-файлы внутри diagrams
+          git add 'diagrams/**/*.png'
           if ! git diff --cached --quiet; then
-            git commit -m "Автоматическая генерация PNG-диаграмм C4"
+            git commit -m "Автоматическая генерация PNG-диаграмм diagrams"
             git push origin HEAD:${{ github.head_ref || github.ref_name }}
           else
             echo "Нет новых PNG для коммита"

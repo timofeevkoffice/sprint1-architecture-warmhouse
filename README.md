@@ -50,29 +50,36 @@
 - Низкая масштабируемость — монолит сложно масштабировать под разные виды нагрузки.
 - Отсутствие асинхронного взаимодействия — долгие операции блокируют сервер.
 
-### 5. Визуализация контекста системы — диаграмма С4
+### 5. Визуализация контекста системы — диаграмма С4
 
-[Диаграмма контекста](C4\system-context.puml)
-
-# Задание 2. Проектирование микросервисной архитектуры
-
-В этом задании вам нужно предоставить только диаграммы в модели C4. Мы не просим вас отдельно описывать получившиеся микросервисы и то, как вы определили взаимодействия между компонентами To-Be системы. Если вы правильно подготовите диаграммы C4, они и так это покажут.
+![Диаграмма контекста](diagrams/1.context/context.png)
 
 **Диаграмма контейнеров (Containers)**
 
-Добавьте диаграмму.
+![Диаграмма контейнеров](diagrams/2.container/containers.png)
 
 **Диаграмма компонентов (Components)**
 
-Добавьте диаграмму для каждого из выделенных микросервисов.
+![API Gateway](diagrams/3.component/api_gateway.png)
+![Automation](diagrams/3.component/automation.png)
+![Billing](diagrams/3.component/billing.png)
+![Device Registry](diagrams/3.component/device_registry.png)
+![Gates](diagrams/3.component/gates.png)
+![Heating](diagrams/3.component/heating.png)
+![Lighting](diagrams/3.component/lighting.png)
+![Surveillance](diagrams/3.component/surveillance.png)
+![Telemetry](diagrams/3.component/telemetry.png)
+![Users](diagrams/3.component/users.png)
 
 **Диаграмма кода (Code)**
 
-Добавьте одну диаграмму или несколько.
+![Code](diagrams/4.code/heating_service.png)
 
 # Задание 3. Разработка ER-диаграммы
 
-Добавьте сюда ER-диаграмму. Она должна отражать ключевые сущности системы, их атрибуты и тип связей между ними.
+**ER-диаграмма**
+
+![ER](diagrams/ER/ER.png)
 
 # Задание 4. Создание и документирование API
 
