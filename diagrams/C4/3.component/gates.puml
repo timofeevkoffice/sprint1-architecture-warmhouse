@@ -1,0 +1,28 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(gate, "Сервис ворот", "Go")
+
+Boundary(gate_internals, "Внутренности") {
+    Component(api, "REST API", "Gin", "Открыть/закрыть")
+    Component(logic, "Логика ворот", "Go", "Контроль доступа")
+    Component(device_adapter, "Адаптер привода", "MQTT", "Команды воротам")
+    Component(event_publisher, "Публикатор событий", "AMQP", "События открытия/закрытия")
+    Component(repo, "Репозиторий", "GORM", "Логи доступа")
+}
+
+ContainerDb(gate_db, "БД ворот", "PostgreSQL")
+Container(message_broker, "Брокер сообщений", "RabbitMQ")
+System_Ext(partner_devices, "Устройства партнёров")
+Container(api_gateway, "API Gateway")
+
+Rel(api_gateway, api, "REST")
+Rel(api, logic, "вызывает")
+Rel(logic, repo, "использует")
+Rel(logic, device_adapter, "отправляет")
+Rel(logic, event_publisher, "публикует")
+Rel(device_adapter, partner_devices, "MQTT")
+Rel(event_publisher, message_broker, "AMQP")
+Rel(repo, gate_db, "SQL")
+
+@enduml

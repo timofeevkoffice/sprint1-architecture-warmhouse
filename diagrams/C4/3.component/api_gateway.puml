@@ -1,0 +1,33 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(api_gateway, "API Gateway", "Kong / Nginx")
+
+Boundary(api_gateway_internals, "Внутренности API Gateway") {
+    Component(auth, "Аутентификатор", "JWT / OAuth2", "Проверяет токены и права доступа")
+    Component(router, "Маршрутизатор", "OpenResty / Lua", "Направляет запросы к нужным сервисам")
+    Component(rate_limiter, "Лимитер запросов", "Token bucket", "Ограничивает частоту вызовов")
+    Component(logger, "Логгер", "ELK / stdout", "Логирует входящие запросы и ответы")
+}
+
+System_Ext(client, "Веб-интерфейс / Мобильное приложение")
+Container(device_management, "Сервис управления устройствами", "Go")
+Container(device_registry, "Реестр устройств", "Go")
+Container(telemetry, "Сервис телеметрии", "Go")
+Container(automation, "Сервис автоматизации", "Go")
+Container(users, "Сервис пользователей", "Go")
+Container(billing, "Сервис биллинга", "Go")
+
+Rel(client, api_gateway, "HTTPS", "JSON")
+Rel(api_gateway, auth, "вызывает")
+Rel(auth, router, "передаёт проверенный запрос")
+Rel(router, rate_limiter, "проверяет лимиты")
+Rel(rate_limiter, logger, "записывает")
+Rel(router, device_management, "REST")
+Rel(router, device_registry, "REST")
+Rel(router, telemetry, "REST")
+Rel(router, automation, "REST")
+Rel(router, users, "REST")
+Rel(router, billing, "REST")
+
+@enduml
