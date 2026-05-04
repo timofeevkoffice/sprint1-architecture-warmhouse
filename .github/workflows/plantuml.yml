@@ -31,8 +31,10 @@ jobs:
       - name: Generate Diagrams
         run: |
           mkdir -p diagrams
-          # Генерируем все .puml файлы, сохраняя структуру вложенности
-          plantuml -tpng -o "../diagrams" "C4/**/*.puml"
+          # обрабатываем каждую папку отдельно
+          for dir in C4/1.context C4/2.container C4/3.component C4/4.code; do
+            plantuml -tpng -o "../../diagrams/$(basename $dir)" "$dir/*.puml"
+          done
 
       - name: Commit and push diagrams
         run: |
