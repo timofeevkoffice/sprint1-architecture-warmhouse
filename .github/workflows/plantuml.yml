@@ -19,21 +19,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Generate PNG (side by side with .puml)
+      - name: Generate PNG side by side with .puml
         run: |
           docker run --rm -v ${{ github.workspace }}:/data plantuml/plantuml -tpng "/data/C4/**/*.puml"
 
-      - name: Copy the whole C4 structure into diagrams/
-        run: |
-          mkdir -p diagrams
-          cp -r C4 diagrams/
-
-      - name: Commit and push diagrams
+      - name: Commit and push generated PNGs
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add diagrams/
+          # Добавляем только PNG-файлы внутри C4
+          git add 'C4/**/*.png'
           if ! git diff --cached --quiet; then
-            git commit -m "Автоматическая генерация диаграмм C4 (с сохранением структуры)"
+            git commit -m "Автоматическая генерация PNG-диаграмм C4"
             git push origin HEAD:${{ github.head_ref || github.ref_name }}
+          else
+            echo "Нет новых PNG для коммита"
           fi
