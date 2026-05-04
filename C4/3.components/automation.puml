@@ -1,0 +1,26 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(automation, "Сервис автоматизации", "Go")
+
+Boundary(automation_internals, "Внутренности Сервиса автоматизации") {
+    Component(rule_engine, "Движок правил", "Go", "Проверка условий срабатывания")
+    Component(scenario_repo, "Хранилище сценариев", "GORM", "Загрузка сценариев из БД")
+    Component(action_executor, "Исполнитель действий", "HTTP/MQTT", "Посылает команды на устройства")
+    Component(event_consumer, "Потребитель событий", "AMQP", "Слушает события телеметрии")
+}
+
+ContainerDb(device_db, "БД устройств", "PostgreSQL")
+Container(message_broker, "Брокер сообщений", "RabbitMQ / Kafka")
+System_Ext(partner_devices, "Устройства партнёров")
+Container(api_gateway, "API Gateway")
+
+Rel(api_gateway, rule_engine, "REST")
+Rel(event_consumer, message_broker, "Подписывается", "AMQP")
+Rel(event_consumer, rule_engine, "Передаёт событие")
+Rel(rule_engine, scenario_repo, "Загружает сценарии")
+Rel(rule_engine, action_executor, "Вызывает при срабатывании")
+Rel(action_executor, partner_devices, "MQTT/HTTP")
+Rel(scenario_repo, device_db, "SQL")
+
+@enduml

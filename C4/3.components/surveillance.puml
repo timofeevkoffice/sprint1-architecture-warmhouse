@@ -1,0 +1,28 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(surveillance, "Сервис видеонаблюдения", "Go")
+
+Boundary(surveillance_internals, "Внутренности") {
+    Component(api, "REST API", "Gin", "Получение видео, детекция")
+    Component(stream_manager, "Менеджер потоков", "Go", "Управление видеопотоками")
+    Component(motion_detector, "Детектор движения", "OpenCV", "Анализ кадров")
+    Component(event_publisher, "Публикатор событий", "AMQP", "События движения")
+    Component(repo, "Репозиторий", "GORM", "Метаданные записей")
+}
+
+ContainerDb(surveillance_db, "БД видеонаблюдения", "PostgreSQL")
+Container(message_broker, "Брокер сообщений", "RabbitMQ")
+System_Ext(partner_devices, "Камеры партнёров")
+Container(api_gateway, "API Gateway")
+
+Rel(api_gateway, api, "REST, WebSocket")
+Rel(api, stream_manager, "вызывает")
+Rel(stream_manager, motion_detector, "использует")
+Rel(stream_manager, event_publisher, "публикует")
+Rel(stream_manager, repo, "сохраняет")
+Rel(stream_manager, partner_devices, "RTSP/HTTP")
+Rel(event_publisher, message_broker, "AMQP")
+Rel(repo, surveillance_db, "SQL")
+
+@enduml

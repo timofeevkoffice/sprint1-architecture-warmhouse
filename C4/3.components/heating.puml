@@ -1,0 +1,28 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(heating, "Сервис отопления", "Go")
+
+Boundary(heating_internals, "Внутренности") {
+    Component(api, "REST API", "Gin", "Приём команд")
+    Component(logic, "Логика отопления", "Go", "Управление температурой")
+    Component(device_adapter, "Адаптер термостатов", "MQTT", "Команды клапанам")
+    Component(event_publisher, "Публикатор событий", "AMQP", "События температуры")
+    Component(repo, "Репозиторий", "GORM", "Работа с БД")
+}
+
+ContainerDb(heating_db, "БД отопления", "PostgreSQL")
+Container(message_broker, "Брокер сообщений", "RabbitMQ")
+System_Ext(partner_devices, "Устройства партнёров")
+Container(api_gateway, "API Gateway")
+
+Rel(api_gateway, api, "REST")
+Rel(api, logic, "вызывает")
+Rel(logic, repo, "использует")
+Rel(logic, device_adapter, "отправляет")
+Rel(logic, event_publisher, "публикует")
+Rel(device_adapter, partner_devices, "MQTT")
+Rel(event_publisher, message_broker, "AMQP")
+Rel(repo, heating_db, "SQL")
+
+@enduml

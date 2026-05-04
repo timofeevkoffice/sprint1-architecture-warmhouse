@@ -1,0 +1,28 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(device_registry, "Реестр устройств", "Go")
+
+Boundary(dr_internals, "Внутренности Реестра устройств") {
+    Component(api, "REST API", "Gin", "Регистрация, получение конфигурации")
+    Component(device_manager, "Менеджер устройств", "Go", "Валидация и сохранение устройств")
+    Component(protocol_adapter, "Адаптер протоколов", "MQTT/HTTP", "Общение с устройствами")
+    Component(provisioning, "Провижининг", "Go", "Выдача учётных данных устройству")
+    Component(repo, "Репозиторий", "GORM", "Работа с БД")
+}
+
+ContainerDb(device_db, "БД устройств", "PostgreSQL")
+System_Ext(partner_devices, "Устройства партнёров")
+Container(message_broker, "Брокер сообщений", "RabbitMQ / Kafka")
+Container(api_gateway, "API Gateway")
+
+Rel(api_gateway, api, "REST")
+Rel(api, device_manager, "Calls")
+Rel(device_manager, repo, "Uses")
+Rel(device_manager, provisioning, "Uses")
+Rel(provisioning, protocol_adapter, "Uses")
+Rel(protocol_adapter, partner_devices, "MQTT/HTTP")
+Rel(device_manager, message_broker, "Публикует событие о новом устройстве", "AMQP")
+Rel(repo, device_db, "SQL")
+
+@enduml
