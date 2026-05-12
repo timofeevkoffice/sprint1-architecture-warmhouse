@@ -1,0 +1,26 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(users, "Сервис пользователей", "Go")
+
+Boundary(users_internals, "Внутренности Сервиса пользователей") {
+    Component(api, "REST API", "Gin", "Регистрация, логин, профиль")
+    Component(auth_service, "Auth Service", "JWT", "Выпуск и проверка токенов")
+    Component(role_manager, "Менеджер ролей", "Go", "Права доступа (владелец/гость)")
+    Component(repo, "Репозиторий", "GORM", "Доступ к БД пользователей")
+}
+
+ContainerDb(users_db, "БД пользователей", "PostgreSQL")
+System_Ext(email_service, "Email сервис", "Для подтверждения")
+Container(api_gateway, "API Gateway")
+
+Rel(api_gateway, api, "REST")
+Rel(api, auth_service, "Uses")
+Rel(api, role_manager, "Uses")
+Rel(api, repo, "Uses")
+Rel(auth_service, repo, "Ищет пользователя")
+Rel(role_manager, repo, "Читает роли")
+Rel(repo, users_db, "SQL")
+Rel(auth_service, email_service, "Отправляет письма")
+
+@enduml

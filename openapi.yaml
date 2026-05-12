@@ -1,0 +1,193 @@
+openapi: 3.0.0
+info:
+  title: Smart Home Sensor API
+  description: API для управления датчиками в экосистеме «Тёплый дом»
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Локальный сервер разработки
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Проверка доступности API
+      responses:
+        '200':
+          description: API работает
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  /api/v1/sensors:
+    get:
+      summary: Get all sensors
+      description: Возвращает список всех датчиков
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sensor'
+    post:
+      summary: Create a new sensor
+      description: Создаёт новый датчик
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SensorInput'
+      responses:
+        '201':
+          description: Датчик создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sensor'
+        '400':
+          description: Некорректные данные
+
+  /api/v1/sensors/{id}:
+    get:
+      summary: Get sensor by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Идентификатор датчика
+      responses:
+        '200':
+          description: Датчик найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sensor'
+        '404':
+          description: Датчик не найден
+    put:
+      summary: Update sensor by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SensorInput'
+      responses:
+        '200':
+          description: Датчик обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sensor'
+        '404':
+          description: Датчик не найден
+    delete:
+      summary: Delete sensor by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Датчик удалён
+        '404':
+          description: Датчик не найден
+
+  /api/v1/sensors/{id}/value:
+    patch:
+      summary: Update sensor value and status
+      description: Частичное обновление показаний датчика
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: number
+                  example: 22.5
+                status:
+                  type: string
+                  example: active
+      responses:
+        '200':
+          description: Значение обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sensor'
+        '404':
+          description: Датчик не найден
+
+components:
+  schemas:
+    Sensor:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Living Room Temperature
+        type:
+          type: string
+          example: temperature
+        location:
+          type: string
+          example: Living Room
+        unit:
+          type: string
+          example: °C
+        value:
+          type: number
+          example: 22.5
+        status:
+          type: string
+          example: active
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    SensorInput:
+      type: object
+      required:
+        - name
+        - type
+        - location
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        location:
+          type: string
+        unit:
+          type: string
