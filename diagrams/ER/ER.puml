@@ -13,10 +13,18 @@ entity User {
 entity House {
   * house_id : UUID <<PK>>
   --
-  user_id : UUID <<FK>>
   name : VARCHAR(100)
   address : TEXT
   timezone : VARCHAR(50)
+}
+
+' Связующая таблица для many-to-many
+entity HouseMember {
+  * house_id : UUID <<PK, FK>>
+  * user_id : UUID <<PK, FK>>
+  --
+  role : VARCHAR(20)   ' owner, member, guest
+  joined_at : TIMESTAMP
 }
 
 entity Device {
@@ -70,8 +78,10 @@ entity ActionLog {
   result : VARCHAR(20)
 }
 
-' Связи между сущностями
-User ||--o{ House : owns
+' Связи (теперь many-to-many через HouseMember)
+User ||--o{ HouseMember : "участвует в"
+House ||--o{ HouseMember : "имеет участников"
+
 House ||--o{ Device : contains
 Device ||--o{ Sensor : has
 Sensor ||--o{ Telemetry : generates
